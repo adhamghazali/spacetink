@@ -48,12 +48,27 @@ else:
     "Please insert character name!"
     st.stop()
 
-if gen_char:
-
-    generated_response=open_ai_query(prompt)
-    resp=str(generated_response['choices'][0]['text'])
-
-    st.markdown(resp)
+terminate=False
+if not gen_char:
+    st.warning('Please push.')
+else:
+    counter=0
+    while(terminate==False):
+        generated_response=open_ai_query(prompt)
+        resp=str(generated_response['choices'][0]['text'])
+        st.markdown(resp)
+        question=st.text_input("ask a question: "+str(counter), key=counter)
+        
+        if len(question)>0:
+            print("inside", counter)
+            "wht happened?"
+            counter+=1
+        else:
+            st.warning("ask your question please")
+        if counter==10:
+            print(counter)
+            terminate=True
+    
    
     
 
