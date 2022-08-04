@@ -10,6 +10,7 @@ import openai
 
 
 
+
 def open_ai_query(pr):
  
     openai.api_key ="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"
@@ -29,26 +30,19 @@ def open_ai_query(pr):
     
     return response
 
-def form_callback(counter):
-     if "772" not in st.session_state:
-            st.session_state["772"] = counter
+def my_widget(key):
+    st.subheader('Hello there!')
+    return st.button("Click me " + key)
 
 
-def ask_question(counter):
-    question=st.text_input("ask a question: "+str(counter), key=counter)
-    apply=st.button("Apply",key=100,on_click=form_callback(counter))
-    print(gen_char)
-    
-
-    if apply:
-        print(gen_char)
-        if len(question)!=0:
-            print("inside", counter)
-            "wht happened?"
-            counter+=1
-            prompt=prompt+resp+question
-            print("I got here")
-            ask_question(counter)
+        
+        #if len(question)!=0:
+        #    print("inside", counter)
+        #    "wht happened?"
+        #    counter+=1
+        #    prompt=prompt+resp+question
+        #    print("I got here")
+        #    ask_question(counter)
             
 
 
@@ -66,11 +60,12 @@ klass=st.selectbox('Class',characterClasses)
 background=st.selectbox('Background',characterBackgrounds)
 st.write(st.session_state)
 
+
+if 'count' not in st.session_state:
+	st.session_state.count = 0
+
 global gen_char
 gen_char=st.button("Generate Character",key=772)
-
-
-
 if name:
     prompt="The following is a conversation with an intelligent fictional character, thier name is "+name+". The character's race is "+ race+".he/she is a " + klass+" with an "+background+"background.\n\nHuman: Hello, who are you? Tell me about yourself, what's your history, traits, and favorite sport?\n\n",
     prompt=prompt[0]
@@ -79,17 +74,41 @@ else:
     st.stop()
 
 if gen_char:
-    counter=0
+    
     
     with st.spinner('Wait for it...'):
         generated_response=open_ai_query(prompt)
-        
+    #global resp        
     resp=str(generated_response['choices'][0]['text'])
-    st.markdown(resp)
-    ask_question(counter)
-          
+    st.session_state.count += 1
+    os.remove("demofile2.txt")
+    f = open("demofile2.txt", "a")
+    f.write(resp)
+    f.close()
 
-       
+f = open("demofile2.txt", "r")
+
+resp=f.read()
+f.close()
+st.markdown(resp)
+
+#clicked=st.button("Ask me a question")
+if 'counter' not in st.session_state:
+	st.session_state.counter = 0
+def ask_questiton():
+    st.session_state.counter+=1
+
+    text=st.text_input("add a new question",key=st.session_state.counter)
+    st.markdown(text)
+    clicked=st.button("Ask me a question",key=st.session_state.counter)
+    if clicked:
+        ask_questiton()
+    
+ask_questiton()
+
+
+
+
    
     
 
