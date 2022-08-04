@@ -1,5 +1,7 @@
 
+from cgi import print_form
 import prompt_toolkit
+from requests import session
 import streamlit as st
 import time
 import os
@@ -27,6 +29,28 @@ def open_ai_query(pr):
     
     return response
 
+def form_callback(counter):
+     if "772" not in st.session_state:
+            st.session_state["772"] = counter
+
+
+def ask_question(counter):
+    question=st.text_input("ask a question: "+str(counter), key=counter)
+    apply=st.button("Apply",key=100,on_click=form_callback(counter))
+    print(gen_char)
+    
+
+    if apply:
+        print(gen_char)
+        if len(question)!=0:
+            print("inside", counter)
+            "wht happened?"
+            counter+=1
+            prompt=prompt+resp+question
+            print("I got here")
+            ask_question(counter)
+            
+
 
 st.markdown("### Welcome to Spacetink® Character Generator")
 st.markdown('choose your characeter attributes')
@@ -40,35 +64,32 @@ characterBackgrounds = ("Acolyte", "Acolyte - Baldur's Gate", "Acolyte (Luxonbor
 race=st.selectbox('Race',characterRaces)
 klass=st.selectbox('Class',characterClasses)
 background=st.selectbox('Background',characterBackgrounds)
+st.write(st.session_state)
 
-gen_char=st.button("Generate Character")
+global gen_char
+gen_char=st.button("Generate Character",key=772)
+
+
+
 if name:
     prompt="The following is a conversation with an intelligent fictional character, thier name is "+name+". The character's race is "+ race+".he/she is a " + klass+" with an "+background+"background.\n\nHuman: Hello, who are you? Tell me about yourself, what's your history, traits, and favorite sport?\n\n",
+    prompt=prompt[0]
 else:
     "Please insert character name!"
     st.stop()
 
-terminate=False
-if not gen_char:
-    st.warning('Please push.')
-else:
+if gen_char:
     counter=0
-    while(terminate==False):
-        generated_response=open_ai_query(prompt)
-        resp=str(generated_response['choices'][0]['text'])
-        st.markdown(resp)
-        question=st.text_input("ask a question: "+str(counter), key=counter)
-        
-        if len(question)>0:
-            print("inside", counter)
-            "wht happened?"
-            counter+=1
-        else:
-            st.warning("ask your question please")
-        if counter==10:
-            print(counter)
-            terminate=True
     
+    with st.spinner('Wait for it...'):
+        generated_response=open_ai_query(prompt)
+        
+    resp=str(generated_response['choices'][0]['text'])
+    st.markdown(resp)
+    ask_question(counter)
+          
+
+       
    
     
 
