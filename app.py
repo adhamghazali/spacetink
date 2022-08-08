@@ -1,5 +1,6 @@
 
 from cgi import print_form
+from urllib import response
 import prompt_toolkit
 from requests import session
 import streamlit as st
@@ -8,7 +9,8 @@ import os
 from turtle import st as trt
 import openai
 
-
+path_to_file="demofile1.txt"
+path_to_file_2="demofile2.txt"
 
 
 def open_ai_query(pr):
@@ -30,21 +32,6 @@ def open_ai_query(pr):
     
     return response
 
-def my_widget(key):
-    st.subheader('Hello there!')
-    return st.button("Click me " + key)
-
-
-        
-        #if len(question)!=0:
-        #    print("inside", counter)
-        #    "wht happened?"
-        #    counter+=1
-        #    prompt=prompt+resp+question
-        #    print("I got here")
-        #    ask_question(counter)
-            
-
 
 st.markdown("### Welcome to Spacetink® Character Generator")
 st.markdown('choose your characeter attributes')
@@ -62,17 +49,22 @@ st.write(st.session_state)
 
 
 if 'count' not in st.session_state:
-	st.session_state.count = 0
+    st.session_state.count = 0
 
-global gen_char
 gen_char=st.button("Generate Character",key=772)
+
 if name:
     prompt="The following is a conversation with an intelligent fictional character, thier name is "+name+". The character's race is "+ race+".he/she is a " + klass+" with an "+background+"background.\n\nHuman: Hello, who are you? Tell me about yourself, what's your history, traits, and favorite sport?\n\n",
     prompt=prompt[0]
-else:
+else: 
     "Please insert character name!"
     st.stop()
 
+@st.cache(allow_output_mutation=True)
+def Response():
+    return []
+
+response_=Response()
 if gen_char:
     
     
@@ -80,31 +72,54 @@ if gen_char:
         generated_response=open_ai_query(prompt)
     #global resp        
     resp=str(generated_response['choices'][0]['text'])
-    st.session_state.count += 1
-    os.remove("demofile2.txt")
-    f = open("demofile2.txt", "a")
-    f.write(resp)
-    f.close()
-
-f = open("demofile2.txt", "r")
-
-resp=f.read()
-f.close()
-st.markdown(resp)
+    response_=resp
+   
+try:
+    st.markdown(response_)
+except:
+    "Please generate character"
 
 #clicked=st.button("Ask me a question")
 if 'counter' not in st.session_state:
 	st.session_state.counter = 0
-def ask_questiton():
-    st.session_state.counter+=1
 
-    text=st.text_input("add a new question",key=st.session_state.counter)
-    st.markdown(text)
-    clicked=st.button("Ask me a question",key=st.session_state.counter)
+def ask_question(prompt,resp):
+    question=st.text_input("write question here",key=st.session_state.counter)
+    clicked=st.button("Ask A Question",key=st.session_state.counter) 
     if clicked:
-        ask_questiton()
-    
-ask_questiton()
+        st.session_state.counter+=1    
+        if len(question)>0:
+            question='\n'+name+': '+ question
+            
+            #if os.path.exists(path_to_file_2):
+                    #os.remove(path_to_file_2)
+
+            prompt=prompt+resp+'\n'+question
+            st.markdown(prompt)
+            with st.spinner('Wait for it...'):
+                generated_response=open_ai_query(prompt)
+                print(generated_response)
+            #global resp        
+            resp=str(generated_response['choices'][0]['text'])
+            print(resp)
+
+            G = open(path_to_file_2, "a")
+            G.write('\n'+resp+'\n') 
+            G.close()
+            
+        #ask_questiton()
+
+#ask_question(prompt,resp)
+
+#if os.path.exists(path_to_file_2):
+#    F = open(path_to_file_2, "r")
+#    text=F.read()
+#    F.close()
+#    #st.markdown(text)
+
+
+
+
 
 
 
