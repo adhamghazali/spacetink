@@ -18,4 +18,4 @@ def main(name='Dr.Peter', theme='fantasy'):
     print(prompt)
     return prompt
 
-main()
+#main()
